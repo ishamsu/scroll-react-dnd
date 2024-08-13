@@ -17,7 +17,7 @@ function getScrollDirection({ position, upperBounds = Infinity, lowerBounds = -I
   return "stable";
 }
 
-export const useScroll = (ref, ref2) => {
+export const useScroll = (ref, tableRef) => {
   // State to track the current position and whether scrolling is allowed
   const [config, setConfig] = useState({
     position: 0,
@@ -35,10 +35,10 @@ export const useScroll = (ref, ref2) => {
 
   // Get the bounding rectangle of the referenced element
   const bounds = ref.current?.getBoundingClientRect();
-  const bounds1 = ref2.current;
+  const bounds1 = tableRef.current;
 
-  console.log("this is for list ref", bounds); // For debugging: log bounds to console
-  console.log("this is for table", bounds1); // For debugging: log bounds to console
+  console.log("this is for list ref", bounds); 
+  console.log("this is for table", bounds1);
 
   // Determine the direction of scrolling based on the current position and element bounds
   const direction = getScrollDirection({
@@ -53,7 +53,8 @@ export const useScroll = (ref, ref2) => {
       if (direction !== "stable" && isScrollAllowed) {
         // Scroll the element in the determined direction using tableRef.scrollTop
         const scrollAmount = scrollSpeed * (direction === "top" ? -1 : 1);
-        // ref2.current.scrollTop(ref2.current.scrollPosition.top + scrollAmount);
+        // scrollTop is on table ref, check rc suite table ducumantaion
+        tableRef.current.scrollTop(tableRef.current.scrollPosition.top + scrollAmount);
         // Request the next animation frame
         scrollFrameId.current = requestAnimationFrame(scroll);
       }
