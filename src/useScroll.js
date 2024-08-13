@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
 // Define the height from the edge of the viewport where scrolling should start
-const BOUND_HEIGHT = 100;
+const BOUND_HEIGHT = 200;
 
 function getScrollDirection({ position, upperBounds = Infinity, lowerBounds = -Infinity }) {
   // Determine the scroll direction based on the current position and bounds
@@ -17,7 +17,7 @@ function getScrollDirection({ position, upperBounds = Infinity, lowerBounds = -I
   return "stable";
 }
 
-export const useScroll = (ref) => {
+export const useScroll = (ref, ref2) => {
   // State to track the current position and whether scrolling is allowed
   const [config, setConfig] = useState({
     position: 0,
@@ -35,8 +35,11 @@ export const useScroll = (ref) => {
 
   // Get the bounding rectangle of the referenced element
   const bounds = ref.current?.getBoundingClientRect();
-  console.log(bounds); // For debugging: log bounds to console
-  
+  const bounds1 = ref2.current;
+
+  console.log("this is for list ref", bounds); // For debugging: log bounds to console
+  console.log("this is for table", bounds1); // For debugging: log bounds to console
+
   // Determine the direction of scrolling based on the current position and element bounds
   const direction = getScrollDirection({
     position,
@@ -48,8 +51,9 @@ export const useScroll = (ref) => {
     // Function to perform scrolling and request the next animation frame
     const scroll = () => {
       if (direction !== "stable" && isScrollAllowed) {
-        // Scroll the element in the determined direction
-        ref.current?.scrollBy(0, scrollSpeed * (direction === "top" ? -1 : 1));
+        // Scroll the element in the determined direction using tableRef.scrollTop
+        const scrollAmount = scrollSpeed * (direction === "top" ? -1 : 1);
+        // ref2.current.scrollTop(ref2.current.scrollPosition.top + scrollAmount);
         // Request the next animation frame
         scrollFrameId.current = requestAnimationFrame(scroll);
       }

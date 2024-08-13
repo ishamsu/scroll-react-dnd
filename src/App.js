@@ -6,7 +6,7 @@ import { Cell, Column, HeaderCell, Table } from "rsuite-table";
 
 const style = {
   width: "100%",
-  height: "100vh",
+  height: "100%",
   overflow: "scroll",
 };
 
@@ -26,8 +26,12 @@ function mockUsers(numUsers) {
 
 const App = () => {
   const listRef = useRef(null);
+  const tableRef = useRef(null);
+
   const fakeData = mockUsers(100);
   const [data, setData] = useState(fakeData);
+
+ 
 
   // Define column with name and width
   const [columns, setColumns] = useState([
@@ -37,85 +41,88 @@ const App = () => {
     { id: "email", name: "Email", width: 300, flexGrow: 1 },
   ]);
 
-  const moveCard = useCallback((dragIndex, hoverIndex) => {
-  
-  }, []);
+  const moveCard = useCallback((dragIndex, hoverIndex) => {}, []);
 
-// Scroll logic for handling drag-and-drop scrolling
+  // Scroll logic for handling drag-and-drop scrolling
 
-// Retrieve the custom hook for managing scroll behavior
-const { updatePosition } = useScroll(listRef);
+  // Retrieve the custom hook for managing scroll behavior
+  const { updatePosition } = useScroll(listRef, tableRef);
 
-// Access the drag-and-drop manager and monitor from react-dnd
-const dragDropManager = useDragDropManager();
-const monitor = dragDropManager.getMonitor();
+  // Access the drag-and-drop manager and monitor from react-dnd
+  const dragDropManager = useDragDropManager();
+  const monitor = dragDropManager.getMonitor();
 
-// Effect hook to handle scroll updates based on drag events
-useEffect(() => {
-  // Subscribe to changes in the drag offset
-  const unsubscribe = monitor.subscribeToOffsetChange(() => {
-    // Get the current vertical offset of the dragged item
-    const offset = monitor.getSourceClientOffset()?.y;
-    
-    // Update the scroll position and allow scrolling if needed
-    updatePosition({ position: offset, isScrollAllowed: true });
-  });
+  // Effect hook to handle scroll updates based on drag events
+  useEffect(() => {
+    // Subscribe to changes in the drag offset
+    const unsubscribe = monitor.subscribeToOffsetChange(() => {
+      // Get the current vertical offset of the dragged item
+      const offset = monitor.getSourceClientOffset()?.y;
+console.log("offset",monitor.getSourceClientOffset())
+      // Update the scroll position and allow scrolling if needed
+      updatePosition({ position: offset, isScrollAllowed: true });
+    });
 
-  // Cleanup the subscription when the component unmounts or dependencies change
-  return unsubscribe;
-}, [monitor, updatePosition]);
-
+    // Cleanup the subscription when the component unmounts or dependencies change
+    return unsubscribe;
+  }, [monitor, updatePosition]);
 
   return (
-    <div ref={listRef} style={style}>
-      <Table
-        rowHeight={(rowData) => {
-          return 46;
-        }}
-        height={400}
-        autoHeight={true}
-        data={data}
-        bordered
-        rowKey="id"
-        renderRow={(children, rowData) => {
-          return rowData ? (
-            <RowCard
-              index={rowData.id}
-              rowData={rowData}
-              id={rowData.id}
-              moveCard={moveCard}
+    <>
+      <div style={{ height: "100px" }}></div>
+      <div style={{ height: "100vh" }}>
+        <div style={{ height: "93.6%" }}>
+          <div ref={listRef} style={style}>
+            <Table
+              ref={tableRef}
+              // tableRef={tableRef}
+              fillHeight
+              data={data}
+              bordered
+              rowKey="id"
+              renderRow={(children, rowData) => {
+                return rowData ? (
+                  <RowCard
+                    index={rowData.id}
+                    rowData={rowData}
+                    id={rowData.id}
+                    moveCard={moveCard}
+                  >
+                    {children}
+                  </RowCard>
+                ) : (
+                  children
+                );
+              }}
             >
-              {children}
-            </RowCard>
-          ) : (
-            children
-          );
-        }}
-      >
-        {columns.map((column) => (
-          <Column
-            width={column.width}
-            key={column.id}
-            flexGrow={column?.flexGrow}
-          >
-            <HeaderCell id={column.id} style={{ padding: 0 }}>
-              <div
-                style={{
-                  padding: "0.6rem 1rem",
-                  cursor: "grab",
-                  opacity: 1,
-                  borderLeft: "2px solid #2589f5",
-                  backgroundColor: "gray",
-                }}
-              >
-                {column.name}
-              </div>
-            </HeaderCell>
-            <Cell dataKey={column.id} />
-          </Column>
-        ))}
-      </Table>
-    </div>
+              {columns.map((column) => (
+                <Column
+                  width={column.width}
+                  key={column.id}
+                  flexGrow={column?.flexGrow}
+                >
+                  <HeaderCell id={column.id} style={{ padding: 0 }}>
+                    <div
+                      style={{
+                        padding: "0.6rem 1rem",
+                        cursor: "grab",
+                        opacity: 1,
+                        borderLeft: "2px solid #2589f5",
+                        backgroundColor: "gray",
+                      }}
+                    >
+                      {column.name}
+                    </div>
+                  </HeaderCell>
+                  <Cell dataKey={column.id} />
+                </Column>
+              ))}
+            </Table>
+          </div>
+        </div>
+      </div>
+      <div style={{ height: "100px" }}></div>
+    </>
   );
 };
 
