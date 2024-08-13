@@ -25,15 +25,18 @@ function mockUsers(numUsers) {
 }
 
 const App = () => {
+  // This ref is for the conatiner to identify which direction we are scrolling
   const listRef = useRef(null);
+
+  // This ref is used for table reference
   const tableRef = useRef(null);
 
   const fakeData = mockUsers(100);
+
+  // state to store data used in table
   const [data, setData] = useState(fakeData);
 
- 
-
-  // Define column with name and width
+  // Define column with name and width for the table
   const [columns, setColumns] = useState([
     { id: "id", name: "Id", width: 80 },
     { id: "firstName", name: "First Name", width: 200 },
@@ -42,8 +45,6 @@ const App = () => {
   ]);
 
   const moveCard = useCallback((dragIndex, hoverIndex) => {}, []);
-
-  // Scroll logic for handling drag-and-drop scrolling
 
   // Retrieve the custom hook for managing scroll behavior
   const { updatePosition } = useScroll(listRef, tableRef);
@@ -56,9 +57,14 @@ const App = () => {
   useEffect(() => {
     // Subscribe to changes in the drag offset
     const unsubscribe = monitor.subscribeToOffsetChange(() => {
-      // Get the current vertical offset of the dragged item
+      // Get the current vertical offset of the dragged item on y axis
       const offset = monitor.getSourceClientOffset()?.y;
-console.log("offset",monitor.getSourceClientOffset())
+
+      console.log(
+        "Scroll position of Y axis ..........",
+        monitor.getSourceClientOffset()
+      );
+
       // Update the scroll position and allow scrolling if needed
       updatePosition({ position: offset, isScrollAllowed: true });
     });
@@ -75,7 +81,6 @@ console.log("offset",monitor.getSourceClientOffset())
           <div ref={listRef} style={style}>
             <Table
               ref={tableRef}
-              // tableRef={tableRef}
               fillHeight
               data={data}
               bordered
